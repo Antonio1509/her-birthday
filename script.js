@@ -844,10 +844,13 @@ function startHeroMorph(){
     const style=getComputedStyle(line);
     const transformY=style.transform==="none"||typeof DOMMatrixReadOnly==="undefined"?0:new DOMMatrixReadOnly(style.transform).m42;
     const sampleCanvas=document.createElement("canvas");
-    sampleCanvas.width=Math.max(1,Math.ceil(rect.width));
-    sampleCanvas.height=Math.max(1,Math.ceil(rect.height));
     const sampleContext=sampleCanvas.getContext("2d",{willReadFrequently:true});
     if(!sampleContext) return;
+    sampleContext.font=style.font;
+    const textWidth=sampleContext.measureText(text).width;
+    sampleCanvas.width=Math.max(1,Math.ceil(textWidth));
+    sampleCanvas.height=Math.max(1,Math.ceil(rect.height));
+    const pixelScaleX=rect.width/sampleCanvas.width;
     sampleContext.font=style.font;
     sampleContext.textBaseline="top";
     sampleContext.fillStyle="#fff";
@@ -857,7 +860,7 @@ function startHeroMorph(){
     for(let y=0;y<sampleCanvas.height;y+=step){
       for(let x=0;x<sampleCanvas.width;x+=step){
         if(pixels[(Math.floor(y)*sampleCanvas.width+Math.floor(x))*4+3]>100){
-          samples.push({x:rect.left+x,y:rect.top-transformY+y});
+          samples.push({x:rect.left+x*pixelScaleX,y:rect.top-transformY+y});
         }
       }
     }

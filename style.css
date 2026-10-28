@@ -34,6 +34,7 @@ button{color:inherit}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--gold);outline-offset:4px}
 ::selection{background:rgba(255,77,109,.35);color:var(--text)}
+iframe#nl-badge-frame{display:none!important}
 @view-transition{navigation:auto}
 @property --scroll-warmth{syntax:"<number>";inherits:true;initial-value:.035}
 ::view-transition-old(root){animation:route-out 340ms var(--ease-soft) both}
