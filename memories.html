@@ -3,49 +3,124 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0a10">
 <title>Our memories</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,600&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,600&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
-<main class="memories-page">
-  <div class="memories-wrap">
-    <header class="memories-hero">
-      <h1>Our memories</h1>
-      <p>A few little moments I want to keep forever.</p>
-    </header>
+<body class="memories-body">
+<div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
+<div class="moon" aria-hidden="true">
+  <svg viewBox="0 0 64 64" focusable="false">
+    <defs>
+      <radialGradient id="moon-surface" cx="34%" cy="28%" r="74%">
+        <stop stop-color="#fffdf3"/>
+        <stop offset=".58" stop-color="#f6e8c9"/>
+        <stop offset="1" stop-color="#d7b97e"/>
+      </radialGradient>
+      <radialGradient id="moon-light" cx="25%" cy="20%" r="78%">
+        <stop stop-color="#fff" stop-opacity=".76"/>
+        <stop offset=".42" stop-color="#fff8e9" stop-opacity=".18"/>
+        <stop offset="1" stop-color="#9d7438" stop-opacity=".24"/>
+      </radialGradient>
+      <clipPath id="moon-disc"><circle cx="32" cy="32" r="27"/></clipPath>
+      <filter id="moon-crater-soft" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation=".45"/>
+      </filter>
+    </defs>
+    <circle cx="32" cy="32" r="29.5" fill="#f2c46d" opacity=".08"/>
+    <circle cx="32" cy="32" r="27.5" fill="url(#moon-surface)" stroke="#fff4d6" stroke-opacity=".82" stroke-width=".8"/>
+    <g clip-path="url(#moon-disc)">
+      <circle cx="32" cy="32" r="27" fill="url(#moon-light)"/>
+      <g fill="#b8955e" opacity=".17" filter="url(#moon-crater-soft)">
+        <circle cx="20" cy="20" r="4.3"/>
+        <circle cx="41" cy="17" r="2.7"/>
+        <circle cx="45" cy="35" r="5.1"/>
+        <circle cx="29" cy="42" r="3.3"/>
+        <circle cx="15" cy="39" r="2.2"/>
+        <circle cx="35" cy="27" r="1.7"/>
+      </g>
+      <g fill="none" stroke="#fffdf3" stroke-opacity=".38" stroke-width=".7">
+        <circle cx="19" cy="18.5" r="3.3"/>
+        <circle cx="40.5" cy="15.7" r="2"/>
+        <circle cx="44" cy="33.5" r="4"/>
+        <circle cx="28" cy="40.5" r="2.5"/>
+        <circle cx="14.8" cy="37.8" r="1.6"/>
+      </g>
+      <path d="M11 29C15 13 29 5 44 8" fill="none" stroke="#fff" stroke-opacity=".34" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="22" cy="15" r="1" fill="#fff" opacity=".55"/>
+      <circle cx="37" cy="48" r=".8" fill="#fff" opacity=".48"/>
+    </g>
+  </svg>
+</div>
+<canvas id="fx-canvas" class="fx-canvas" aria-hidden="true"></canvas>
+<button id="shooting-star-target" class="shooting-star-target" type="button" aria-label="Make a wish on the shooting star" hidden></button>
+<p id="wish-toast" class="wish-toast" aria-live="polite"></p>
+<nav class="floating-nav" aria-label="Page navigation">
+  <a href="/?unlocked#home">Home</a>
+  <a href="memories.html" aria-current="page">Memories</a>
+  <a href="/?unlocked#cake">Cake</a>
+</nav>
 
-    <section class="memory-grid" aria-label="Our memories">
-      <article class="memory-card">
-        <img class="memory-art game memory-photo" src="https://i.ibb.co/0pPj4RQk/Whats-App-Image-2026-10-28-at-7-33-36-PM.jpg" alt="A memory of gaming together">
-        <div class="memory-copy">
+<main class="memories-page">
+  <header class="memories-header reveal">
+    <p class="eyebrow">Our memories</p>
+    <h1>Little pieces of forever</h1>
+    <p>A few little moments I want to keep forever.</p>
+  </header>
+
+  <section class="memory-list" aria-label="Our memories">
+    <article class="memory-card polaroid reveal">
+      <div class="polaroid-inner">
+        <div class="polaroid-photo">
+          <img class="memory-photo" src="https://i.ibb.co/0pPj4RQk/Whats-App-Image-2026-10-28-at-7-33-36-PM.jpg" alt="A memory of gaming together" width="720" height="398" loading="lazy" decoding="async">
+          <span class="film-grain" aria-hidden="true"></span>
+        </div>
+        <div class="polaroid-copy">
           <h2>One more game</h2>
           <p>Gaming together till late, and never wanting the night to end.</p>
         </div>
-      </article>
+        <span class="photo-tape" aria-hidden="true"></span>
+      </div>
+    </article>
 
-      <article class="memory-card">
-        <img class="memory-art night memory-photo" src="https://i.ibb.co/mQbk9Ch/Whats-App-Image-2026-10-28-at-7-38-29-PM.jpg" alt="A memory from our late-night talks">
-        <div class="memory-copy">
+    <article class="memory-card polaroid reveal">
+      <div class="polaroid-inner">
+        <div class="polaroid-photo">
+          <img class="memory-photo night-photo" src="https://i.ibb.co/mQbk9Ch/Whats-App-Image-2026-10-28-at-7-38-29-PM.jpg" alt="A memory from our late-night talks" width="720" height="866" loading="lazy" decoding="async">
+          <span class="film-grain" aria-hidden="true"></span>
+        </div>
+        <div class="polaroid-copy">
           <h2>Our late-night talks</h2>
           <p>Every conversation about us and our future is a favorite memory.</p>
         </div>
-      </article>
+        <span class="photo-tape" aria-hidden="true"></span>
+      </div>
+    </article>
 
-      <article class="memory-card">
-        <img class="memory-art everyday memory-photo" src="https://i.ibb.co/0RD1tvZV/Whats-App-Image-2026-10-28-at-7-48-09-PM.jpg" alt="A favorite everyday moment together">
-        <div class="memory-copy">
+    <article class="memory-card polaroid reveal">
+      <div class="polaroid-inner">
+        <div class="polaroid-photo">
+          <img class="memory-photo everyday-photo" src="https://i.ibb.co/0RD1tvZV/Whats-App-Image-2026-10-28-at-7-48-09-PM.jpg" alt="A favorite everyday moment together" width="960" height="1280" loading="lazy" decoding="async">
+          <span class="film-grain" aria-hidden="true"></span>
+        </div>
+        <div class="polaroid-copy">
           <h2>Just being together</h2>
           <p>You make even the ordinary days feel like something special.</p>
         </div>
-      </article>
-    </section>
+        <span class="photo-tape" aria-hidden="true"></span>
+      </div>
+    </article>
+  </section>
 
-    <footer class="memories-footer">
-      <p>Here’s to all the memories we’ve made, and all the ones still to come.</p>
-      <a class="wish" href="index.html?unlocked#home">Back to your birthday</a>
-    </footer>
-  </div>
+  <footer class="memories-footer reveal">
+    <p>Here’s to all the memories we’ve made, and all the ones still to come.</p>
+    <a class="primary-button back-link" href="/?unlocked#home">Back to your birthday</a>
+  </footer>
 </main>
+
+<script src="script.js"></script>
 </body>
 </html>

@@ -3,11 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0a10">
 <title>For you</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,600&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,600&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="gate-page">
 
 <main id="gate">
   <section class="panel" aria-labelledby="t">
@@ -21,23 +24,156 @@
   </section>
 </main>
 
-<main id="home">
-  <div class="wrap">
-    <header class="hero">
-      <h2><span>Happy birthday,</span><span class="name" id="who"></span></h2>
-      <p>I made this just for you.</p>
-    </header>
+<div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
+<div class="moon" aria-hidden="true">
+  <svg viewBox="0 0 64 64" focusable="false">
+    <defs>
+      <radialGradient id="moon-surface" cx="34%" cy="28%" r="74%">
+        <stop stop-color="#fffdf3"/>
+        <stop offset=".58" stop-color="#f6e8c9"/>
+        <stop offset="1" stop-color="#d7b97e"/>
+      </radialGradient>
+      <radialGradient id="moon-light" cx="25%" cy="20%" r="78%">
+        <stop stop-color="#fff" stop-opacity=".76"/>
+        <stop offset=".42" stop-color="#fff8e9" stop-opacity=".18"/>
+        <stop offset="1" stop-color="#9d7438" stop-opacity=".24"/>
+      </radialGradient>
+      <clipPath id="moon-disc"><circle cx="32" cy="32" r="27"/></clipPath>
+      <filter id="moon-crater-soft" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation=".45"/>
+      </filter>
+    </defs>
+    <circle cx="32" cy="32" r="29.5" fill="#f2c46d" opacity=".08"/>
+    <circle cx="32" cy="32" r="27.5" fill="url(#moon-surface)" stroke="#fff4d6" stroke-opacity=".82" stroke-width=".8"/>
+    <g clip-path="url(#moon-disc)">
+      <circle cx="32" cy="32" r="27" fill="url(#moon-light)"/>
+      <g fill="#b8955e" opacity=".17" filter="url(#moon-crater-soft)">
+        <circle cx="20" cy="20" r="4.3"/>
+        <circle cx="41" cy="17" r="2.7"/>
+        <circle cx="45" cy="35" r="5.1"/>
+        <circle cx="29" cy="42" r="3.3"/>
+        <circle cx="15" cy="39" r="2.2"/>
+        <circle cx="35" cy="27" r="1.7"/>
+      </g>
+      <g fill="none" stroke="#fffdf3" stroke-opacity=".38" stroke-width=".7">
+        <circle cx="19" cy="18.5" r="3.3"/>
+        <circle cx="40.5" cy="15.7" r="2"/>
+        <circle cx="44" cy="33.5" r="4"/>
+        <circle cx="28" cy="40.5" r="2.5"/>
+        <circle cx="14.8" cy="37.8" r="1.6"/>
+      </g>
+      <path d="M11 29C15 13 29 5 44 8" fill="none" stroke="#fff" stroke-opacity=".34" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="22" cy="15" r="1" fill="#fff" opacity=".55"/>
+      <circle cx="37" cy="48" r=".8" fill="#fff" opacity=".48"/>
+    </g>
+  </svg>
+</div>
+<nav class="floating-nav" aria-label="Page navigation">
+  <a href="#home" aria-current="page">Home</a>
+  <a href="memories.html">Memories</a>
+  <a href="#cake">Cake</a>
+</nav>
 
-    <article class="letter" id="letter"></article>
+<main id="home" aria-label="Birthday message">
+  <section class="hero full-screen" aria-labelledby="hero-title">
+    <div class="hero-copy reveal">
+      <p class="kicker">Today is all about</p>
+      <h1 id="hero-title">
+        <span class="hero-line">Happy</span>
+        <span class="hero-line hero-birthday">Birthday,<span class="hero-shimmer" aria-hidden="true">Birthday,</span></span>
+        <span class="hero-line hero-name" id="who"></span>
+      </h1>
+      <p class="hero-subtitle">I made this just for you. Scroll slowly.</p>
+    </div>
+    <a class="scroll-cue" href="#letter" aria-label="Scroll to your letter">
+      <span class="scroll-mouse"><span></span></span>
+      <span>Scroll to begin</span>
+    </a>
+  </section>
 
-    <h3>A few things I love about you</h3>
-    <ul class="reasons" id="reasons"></ul>
+  <section class="section letter-section" id="letter" aria-labelledby="letter-heading">
+    <div class="section-heading reveal">
+      <p class="eyebrow">From my heart</p>
+      <h2 id="letter-heading" tabindex="-1">A letter for you</h2>
+    </div>
+    <article class="letter-card reveal">
+      <div id="letter-content" class="letter-content" aria-live="off"></div>
+      <div id="letter-measure" class="letter-content letter-measure" aria-hidden="true"></div>
+      <button id="skip-typing" class="text-button" type="button">Skip typing</button>
+      <span class="envelope-flap" aria-hidden="true"></span>
+    </article>
+  </section>
 
-    <a class="wish" id="wish" href="memories.html">Our memories <span aria-hidden="true">→</span></a>
-  </div>
+  <section class="section reasons-section" id="reasons" aria-labelledby="reasons-heading">
+    <div class="section-heading reveal">
+      <p class="eyebrow">The little things</p>
+      <h2 id="reasons-heading">Things I love about you</h2>
+      <p>Tap each card. There’s always another reason.</p>
+    </div>
+    <div id="reason-grid" class="reason-grid"></div>
+  </section>
+
+  <section class="section cake-section" id="cake" aria-labelledby="cake-heading">
+    <div class="section-heading reveal">
+      <p class="eyebrow">Make a wish</p>
+      <h2 id="cake-heading">A little birthday magic</h2>
+    </div>
+    <div class="cake-scene reveal">
+      <svg class="cake-svg" viewBox="0 0 360 310" role="img" aria-labelledby="cake-title cake-description">
+        <title id="cake-title">A birthday cake with three candles</title>
+        <desc id="cake-description">A two-tier celebration cake with three glowing candles.</desc>
+        <defs>
+          <linearGradient id="cakeTop" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#ffe2c5"/><stop offset="1" stop-color="#eeb79f"/></linearGradient>
+          <linearGradient id="cakeBottom" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#ff7891"/><stop offset="1" stop-color="#b83758"/></linearGradient>
+          <linearGradient id="icing" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#fff5df"/><stop offset="1" stop-color="#f2c46d"/></linearGradient>
+          <radialGradient id="flameGlow"><stop stop-color="#ffd98b" stop-opacity=".8"/><stop offset="1" stop-color="#ffd98b" stop-opacity="0"/></radialGradient>
+        </defs>
+        <ellipse cx="180" cy="274" rx="136" ry="18" fill="#ff4d6d" opacity=".12"/>
+        <path d="M56 207h248v49c0 12-10 22-22 22H78c-12 0-22-10-22-22z" fill="url(#cakeBottom)"/>
+        <path d="M56 207c9 12 19 12 28 0s19-12 28 0 19 12 28 0 19-12 28 0 19 12 28 0 19-12 28 0 19 12 28 0 19-12 28 0 19 12 28 0" fill="none" stroke="#ffd8c8" stroke-width="8" stroke-linecap="round"/>
+        <path d="M98 134h164v70c0 12-9 22-21 22h-122c-12 0-21-10-21-22z" fill="url(#cakeTop)"/>
+        <path d="M98 134c10 12 20 12 30 0s20-12 30 0 20 12 30 0 20-12 30 0 20 12 30 0 20 12 30 0" fill="none" stroke="url(#icing)" stroke-width="9" stroke-linecap="round"/>
+        <path d="M42 279h276c8 0 14 6 14 13v3H28v-3c0-7 6-13 14-13z" fill="#f2c46d"/>
+        <g class="candle candle-one" data-candle="0">
+          <rect x="134" y="91" width="12" height="45" rx="5" fill="#f6eef2"/>
+          <path d="M140 91v-9" stroke="#f6eef2" stroke-width="3" stroke-linecap="round"/>
+          <circle class="flame-halo" cx="140" cy="69" r="25" fill="url(#flameGlow)"/>
+          <path class="flame" d="M140 79c-15-13 2-23 2-35 12 13 17 23 6 34-3 3-5 3-8 1z" fill="#f2c46d"/>
+          <path class="smoke" d="M140 81c-7-8 7-10 0-18"/>
+        </g>
+        <g class="candle candle-two" data-candle="1">
+          <rect x="174" y="91" width="12" height="45" rx="5" fill="#f6eef2"/>
+          <path d="M180 91v-9" stroke="#f6eef2" stroke-width="3" stroke-linecap="round"/>
+          <circle class="flame-halo" cx="180" cy="69" r="25" fill="url(#flameGlow)"/>
+          <path class="flame" d="M180 79c-15-13 2-23 2-35 12 13 17 23 6 34-3 3-5 3-8 1z" fill="#f2c46d"/>
+          <path class="smoke" d="M180 81c-7-8 7-10 0-18"/>
+        </g>
+        <g class="candle candle-three" data-candle="2">
+          <rect x="214" y="91" width="12" height="45" rx="5" fill="#f6eef2"/>
+          <path d="M220 91v-9" stroke="#f6eef2" stroke-width="3" stroke-linecap="round"/>
+          <circle class="flame-halo" cx="220" cy="69" r="25" fill="url(#flameGlow)"/>
+          <path class="flame" d="M220 79c-15-13 2-23 2-35 12 13 17 23 6 34-3 3-5 3-8 1z" fill="#f2c46d"/>
+          <path class="smoke" d="M220 81c-7-8 7-10 0-18"/>
+        </g>
+        <g class="cake-sparkles" fill="#f2c46d">
+          <path d="M66 109v12M60 115h12"/><path d="M285 91v12M280 96h10"/><circle cx="75" cy="164" r="3"/><circle cx="289" cy="176" r="3"/>
+        </g>
+      </svg>
+      <button id="candle-button" class="primary-button" type="button">Blow out the candles</button>
+      <p id="final-message" class="final-message" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <footer class="home-footer reveal">
+    <a class="memories-link" href="memories.html">Our memories <span aria-hidden="true">→</span></a>
+  </footer>
 </main>
-<canvas id="fx" aria-hidden="true"></canvas>
 
+<canvas id="fx-canvas" class="fx-canvas" aria-hidden="true"></canvas>
+<div id="finale-dimmer" aria-hidden="true"></div>
+<button id="shooting-star-target" class="shooting-star-target" type="button" aria-label="Make a wish on the shooting star" hidden></button>
+<p id="wish-toast" class="wish-toast" aria-live="polite"></p>
+<div class="pointer-glow" aria-hidden="true"></div>
 <script src="script.js"></script>
 </body>
 </html>
