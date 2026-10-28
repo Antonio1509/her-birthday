@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>For you</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main id="gate">
+  <section class="panel" aria-labelledby="t">
+    <h1 id="t">Enter your PIN</h1>
+    <p>Four numbers, and something is waiting for you.</p>
+    <div class="diamond" id="diamond" aria-live="polite">
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    </div>
+    <div class="pad" id="pad"></div>
+    <div id="msg" role="status"></div>
+  </section>
+</main>
+
+<main id="home">
+  <div class="wrap">
+    <header class="hero">
+      <h2><span>Happy birthday,</span><span class="name" id="who"></span></h2>
+      <p>I made this just for you.</p>
+    </header>
+
+    <article class="letter" id="letter"></article>
+
+    <h3>A few things I love about you</h3>
+    <ul class="reasons" id="reasons"></ul>
+
+    <a class="wish" id="wish" href="memories.html">Our memories <span aria-hidden="true">→</span></a>
+  </div>
+</main>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script src="script.js"></script>
+</body>
+</html>
