@@ -504,21 +504,26 @@ function revealFinalMessage(){
 
 function initHeadingLetters(headings){
   headings.forEach(heading=>{
-    const text = heading.textContent;
+    const text=heading.textContent;
+    const words=text.trim().split(/\s+/);
+    let letterIndex = 0;
+    const fragment = document.createDocumentFragment();
     heading.setAttribute("aria-label",text);
-    heading.replaceChildren();
-    [...text].forEach((character,index)=>{
-      if(character===" "){
-        heading.appendChild(document.createTextNode(" "));
-        return;
-      }
-      const span = document.createElement("span");
-      span.className = "heading-letter";
-      span.setAttribute("aria-hidden","true");
-      span.textContent = character;
-      span.style.setProperty("--letter-index",String(index));
-      heading.appendChild(span);
+    words.forEach((word,wordIndex)=>{
+      const wordSpan=document.createElement("span");
+      wordSpan.className="heading-word";
+      [...word].forEach(character=>{
+        const span=document.createElement("span");
+        span.className="heading-letter";
+        span.setAttribute("aria-hidden","true");
+        span.textContent=character;
+        span.style.setProperty("--letter-index",String(letterIndex++));
+        wordSpan.appendChild(span);
+      });
+      fragment.appendChild(wordSpan);
+      if(wordIndex<words.length-1) fragment.appendChild(document.createTextNode(" "));
     });
+    heading.replaceChildren(fragment);
   });
 }
 
