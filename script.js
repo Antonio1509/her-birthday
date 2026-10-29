@@ -1,5 +1,5 @@
 /* =========================== CONFIG =========================== */
-const PIN = "1509";
+const PIN = "3010";
 const NAME = "My Love";
 const CONFIG = Object.freeze({
   DEBUG:false,
@@ -732,6 +732,8 @@ function initParallax(){
 }
 
 let fxCanvas,fxContext,fxRatio=1,fxFrame=0,lastFxTime=0,quality=1;
+let heroFxCanvas,heroFxContext,heroRockets=[],heroHeartBursts=[],heroFireworkPatterns=[];
+let heroPatternIndex=0,heroPatternPointIndex=0,heroPatternNextLaunchAt=0,heroPatternWaitUntil=0,heroPatternSize="";
 let qualityStartedAt=0,qualityFrames=0,fxInitialized=false,grainPattern=null;
 let ambientParticles=[],warpStars=[],heroParticles=[],dustParticles=[],confettiPieces=[];
 let fireworkRockets=[],fireworkBursts=[],lanterns=[],balloons=[],shootingStar=null;
@@ -745,12 +747,16 @@ function initFxCanvas(){
   if(fxInitialized) return;
   fxCanvas=$("fx-canvas");
   fxContext=fxCanvas?.getContext("2d",{alpha:true,desynchronized:true});
+  heroFxCanvas=$("hero-fireworks");
+  heroFxContext=heroFxCanvas?.getContext("2d",{alpha:true,desynchronized:true});
   if(!fxCanvas || !fxContext) return;
   fxInitialized=true;
   configureFxCanvas();
+  configureHeroFireworksCanvas();
   makeAmbientParticles();
   makeGrainPattern();
   addEventListener("resize",configureFxCanvas,{passive:true});
+  addEventListener("resize",configureHeroFireworksCanvas,{passive:true});
   document.addEventListener("pointermove",trackDust,{passive:true});
   if(document.body.classList.contains("gift-open")) startFxLoop();
 }
@@ -764,6 +770,21 @@ function configureFxCanvas(){
   fxCanvas.style.height=`${innerHeight}px`;
   fxContext.setTransform(fxRatio,0,0,fxRatio,0,0);
   if(!ambientParticles.length) makeAmbientParticles();
+}
+
+function configureHeroFireworksCanvas(){
+  if(!heroFxCanvas || !heroFxContext) return;
+  const hero=heroFxCanvas.parentElement;
+  if(!hero) return;
+  const rect=hero.getBoundingClientRect();
+  if(!rect.width || !rect.height) return;
+  const ratio=Math.min(devicePixelRatio||1,2);
+  const width=Math.round(rect.width*ratio),height=Math.round(rect.height*ratio);
+  if(heroFxCanvas.width!==width || heroFxCanvas.height!==height){
+    heroFxCanvas.width=width;
+    heroFxCanvas.height=height;
+  }
+  heroFxContext.setTransform(ratio,0,0,ratio,0,0);
 }
 
 function makeGrainPattern(){
@@ -910,6 +931,7 @@ function drawFx(timestamp){
   if(warpStars.length) drawWarp(timestamp);
   drawAmbient(delta);
   drawHeroParticles(timestamp);
+  drawHeroFireworks(timestamp,delta);
   drawDust(delta);
   drawConstellation(timestamp);
   drawShootingStar(timestamp);
@@ -994,6 +1016,207 @@ function drawHeroParticles(timestamp){
     ctx.fill();
   });
   ctx.restore();
+}
+
+function drawHeroFireworks(timestamp,delta){
+  if(!heroFxCanvas || !heroFxContext) return;
+  const ctx=heroFxContext;
+  const hero=heroFxCanvas.parentElement;
+  const copy=document.querySelector(".hero-copy");
+  if(!hero || !copy || reducedMotion.matches ||
+     !document.body.classList.contains("hero-revealed")){
+    ctx.clearRect(0,0,heroFxCanvas.width,heroFxCanvas.height);
+    heroRockets=[];
+    heroHeartBursts=[];
+    heroFireworkPatterns=[];
+    heroPatternSize="";
+    heroPatternIndex=0;
+    heroPatternPointIndex=0;
+    heroPatternNextLaunchAt=0;
+    heroPatternWaitUntil=0;
+    return;
+  }
+
+  const rect=hero.getBoundingClientRect();
+  const copyRect=copy.getBoundingClientRect();
+  if(rect.bottom<=0 || rect.top>=innerHeight){
+    ctx.clearRect(0,0,heroFxCanvas.width,heroFxCanvas.height);
+    heroRockets=[];
+    heroHeartBursts=[];
+    heroFireworkPatterns=[];
+    heroPatternSize="";
+    heroPatternIndex=0;
+    heroPatternPointIndex=0;
+    heroPatternNextLaunchAt=0;
+    heroPatternWaitUntil=0;
+    return;
+  }
+  configureHeroFireworksCanvas();
+  ctx.clearRect(0,0,rect.width,rect.height);
+
+  const mobile=innerWidth<900;
+  const zoneWidth=mobile?Math.max(120,Math.min(rect.width-28,copyRect.width)):Math.min(
+    rect.width-Math.max(rect.width*.62,copyRect.right-rect.left+24),
+    360
+  );
+  const zoneLeft=mobile?(rect.width-zoneWidth)/2:
+    Math.min(rect.width-120,Math.max(rect.width*.62,copyRect.right-rect.left+24));
+  const sceneHeight=mobile?Math.min(170,Math.max(120,copyRect.top-rect.top-16)):rect.height;
+  const sceneOffsetY=mobile?Math.max(0,copyRect.top-rect.top-sceneHeight-8):0;
+  const patternSize=`${Math.round(zoneLeft)}x${Math.round(zoneWidth)}x${Math.round(sceneHeight)}x${mobile}`;
+  if(patternSize!==heroPatternSize){
+    heroPatternSize=patternSize;
+    heroFireworkPatterns=makeHeroFireworkPatterns(zoneLeft,zoneWidth,sceneHeight,mobile);
+    heroRockets=[];
+    heroHeartBursts=[];
+    heroPatternIndex=0;
+    heroPatternPointIndex=0;
+    heroPatternNextLaunchAt=timestamp+700;
+    heroPatternWaitUntil=0;
+  }
+  if(heroPatternIndex>=heroFireworkPatterns.length){
+    heroPatternIndex=0;
+    heroPatternPointIndex=0;
+    heroPatternNextLaunchAt=timestamp+2000;
+  }
+  const pattern=heroFireworkPatterns[heroPatternIndex];
+  if(pattern && heroPatternPointIndex<pattern.points.length && timestamp>=heroPatternNextLaunchAt){
+    const target=pattern.points[heroPatternPointIndex++];
+    const startX=target.x+(Math.random()-.5)*14;
+    const startY=mobile?sceneOffsetY+sceneHeight:rect.height-68;
+    const targetY=target.y+sceneOffsetY;
+    const flightFrames=Math.max(24,Math.ceil((startY-targetY)/11));
+    heroRockets.push({
+      x:startX,y:startY,startX,startY,targetX:target.x,targetY,
+      vx:(target.x-startX)/flightFrames,vy:(targetY-startY)/flightFrames,
+      life:0,flightFrames,color:pattern.color
+    });
+    heroPatternNextLaunchAt=timestamp+72;
+    if(heroPatternPointIndex===pattern.points.length) heroPatternWaitUntil=timestamp+850;
+  }else if(pattern && heroPatternPointIndex===pattern.points.length &&
+           heroRockets.length===0 && timestamp>=heroPatternWaitUntil){
+    heroPatternIndex++;
+    heroPatternPointIndex=0;
+    heroPatternNextLaunchAt=timestamp+220;
+  }
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(zoneLeft,sceneOffsetY,zoneWidth,sceneHeight);
+  ctx.clip();
+  ctx.globalCompositeOperation="lighter";
+  heroRockets.forEach(rocket=>{
+    rocket.x+=rocket.vx*delta;
+    rocket.y+=rocket.vy*delta;
+    rocket.life+=delta;
+    ctx.globalAlpha=.78;
+    ctx.strokeStyle=rocket.color;
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(rocket.x-rocket.vx*4,rocket.y-rocket.vy*4);
+    ctx.lineTo(rocket.x,rocket.y);
+    ctx.stroke();
+    ctx.fillStyle=FX_COLORS.cream;
+    ctx.beginPath();
+    ctx.arc(rocket.x,rocket.y,2.4,0,Math.PI*2);
+    ctx.fill();
+    if(rocket.life>=rocket.flightFrames){
+      heroHeartBursts.push({
+        x:rocket.targetX,y:rocket.targetY,vx:0,vy:0,size:2.1+Math.random()*.8,
+        life:0,maxLife:600+Math.random()*45,color:rocket.color
+      });
+      for(let index=0;index<4;index++){
+        const angle=Math.random()*Math.PI*2,speed=.45+Math.random()*1.35;
+        heroHeartBursts.push({
+          x:rocket.targetX,y:rocket.targetY,vx:Math.cos(angle)*speed,
+          vy:Math.sin(angle)*speed,size:.8+Math.random()*1.2,
+          life:0,maxLife:38+Math.random()*24,
+          color:index%2?FX_COLORS.gold:FX_COLORS.cream
+        });
+      }
+    }
+  });
+  heroRockets=heroRockets.filter(rocket=>rocket.life<rocket.flightFrames);
+  heroHeartBursts=heroHeartBursts.filter(particle=>particle.life<particle.maxLife);
+  heroHeartBursts.forEach(particle=>{
+    particle.x+=particle.vx*delta;
+    particle.y+=particle.vy*delta;
+    particle.life+=delta;
+    ctx.globalAlpha=Math.max(0,1-particle.life/particle.maxLife);
+    ctx.fillStyle=particle.color;
+    ctx.beginPath();
+    ctx.arc(particle.x,particle.y,particle.size*(particle.vx||particle.vy?1:1.25),0,Math.PI*2);
+    ctx.fill();
+  });
+  ctx.restore();
+}
+
+function makeHeroFireworkPatterns(zoneLeft,zoneWidth,height,mobile=false){
+  const sceneWidth=Math.min(zoneWidth*.94,mobile?460:360);
+  const centerX=zoneLeft+zoneWidth/2;
+  const centerY=mobile?height*.48:height*.44;
+  const halfLetterWidth=sceneWidth*.095;
+  const letterHeight=sceneWidth*.36;
+  const heartWidth=sceneWidth*.34;
+  const heartHeight=sceneWidth*.32;
+  const heartPoints=Array.from({length:36},(_,index)=>{
+    const t=index/36*Math.PI*2;
+    const x=16*Math.pow(Math.sin(t),3);
+    const y=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+    return {
+      x:centerX+x/16*heartWidth/2,
+      y:centerY+(y-6)/22*heartHeight
+    };
+  });
+  const sampleLine=(vertices,stepsPerSegment)=>{
+    const points=[];
+    for(let index=0;index<vertices.length-1;index++){
+      const start=vertices[index],end=vertices[index+1];
+      for(let step=0;step<stepsPerSegment;step++){
+        const progress=step/stepsPerSegment;
+        points.push({
+          x:start.x+(end.x-start.x)*progress,
+          y:start.y+(end.y-start.y)*progress
+        });
+      }
+    }
+    points.push(vertices[vertices.length-1]);
+    return points;
+  };
+  const mCenterX=centerX-sceneWidth*.35;
+  const mPoints=sampleLine([
+    {x:mCenterX-halfLetterWidth,y:centerY+letterHeight/2},
+    {x:mCenterX-halfLetterWidth,y:centerY-letterHeight/2},
+    {x:mCenterX,y:centerY},
+    {x:mCenterX+halfLetterWidth,y:centerY-letterHeight/2},
+    {x:mCenterX+halfLetterWidth,y:centerY+letterHeight/2}
+  ],7);
+  const cCenterX=centerX+sceneWidth*.35;
+  const cArc=Array.from({length:37},(_,index)=>{
+    const angle=-Math.PI/2-index/36*Math.PI;
+    return {
+      x:cCenterX+Math.cos(angle)*halfLetterWidth,
+      y:centerY+Math.sin(angle)*letterHeight/2
+    };
+  });
+  const cEndX=cCenterX+halfLetterWidth*1.45;
+  const cEndSteps=Math.max(12,Math.ceil(halfLetterWidth*.45/(Math.PI*letterHeight/108)));
+  const cPoints=[
+    ...sampleLine([
+      {x:cEndX,y:centerY-letterHeight/2},
+      cArc[0]
+    ],cEndSteps),
+    ...cArc.slice(1),
+    ...sampleLine([
+      cArc[cArc.length-1],
+      {x:cEndX,y:centerY+letterHeight/2}
+    ],cEndSteps).slice(1)
+  ];
+  return [
+    {points:heartPoints,color:FX_COLORS.rose},
+    {points:mPoints,color:"#ff8faa"},
+    {points:cPoints,color:"#ff8faa"}
+  ];
 }
 
 let lastPointerX=null,lastPointerY=null;
